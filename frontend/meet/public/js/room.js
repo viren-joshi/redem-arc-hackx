@@ -1,4 +1,5 @@
 const socket = io();
+const flaskSocket = io('https://93bd-49-248-28-246.ngrok-free.app', {transports: ['websocket'], allowEIO3: true});
 const myvideo = document.querySelector("#vd1");
 const roomid = params.get("room");
 let username;
@@ -21,6 +22,83 @@ const canvas = document.querySelector("#whiteboard");
 const ctx = canvas.getContext('2d');
 
 let boardVisisble = false;
+
+
+flaskSocket.on('connect', () => {  
+    console.log('connected to flask server'); 
+    trigger_audio();
+});
+
+flaskSocket.on('alert', (type, data) => {
+    alertModalText = document.getElementById("alertModalText");
+    alertModalText.innerHTML = data;
+
+    alertModalButton = document.getElementById("alertModalButton");
+    alertModalButton.click();
+});
+
+//
+// Audio recording        
+let mediaRecorder;
+const audioChunks = [];
+let isRecording = false;
+
+function startAudioRecording() {
+    navigator.mediaDevices.getUserMedia({ audio: true })
+        .then((stream) => {
+            mediaRecorder = new MediaRecorder(stream);
+
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    audioChunks.push(event.data);
+                }
+            };
+
+            mediaRecorder.onstart = () => {
+                console.log('Started recording');
+                isRecording = true;
+            };
+
+            mediaRecorder.onstop = () => {
+                console.log('Stopped recording');
+                isRecording = false;
+            };
+
+            mediaRecorder.start();
+        })
+        .catch((error) => {
+            console.error('Error accessing microphone:', error);
+        });
+}
+
+function pushAudioToAPI() {
+    if (isRecording) {
+        mediaRecorder.stop();
+        mediaRecorder.start();
+    }
+
+    if (audioChunks.length > 0) {
+        const audioChunksBlob = new Blob(audioChunks, { type: 'audio/wav' });
+        const reader = new FileReader();
+
+        reader.onloadend = () => {
+            const base64String = reader.result.replace('data:', '').replace(/^.+,/, '');
+
+            flaskSocket.emit('flask_audio', base64String, username);
+
+            // Clear audio chunks after processing
+            audioChunks.length = 0;
+        };
+
+        reader.readAsDataURL(audioChunksBlob);
+    }
+}
+
+function trigger_audio() {
+    startAudioRecording();
+    setInterval(pushAudioToAPI, 15000); 
+}
+//
 
 whiteboardCont.style.visibility = 'hidden';
 
@@ -247,13 +325,32 @@ function reportError(e) {
 
 
 function startCall() {
-
+    console.log("startCall() called")
     navigator.mediaDevices.getUserMedia(mediaConstraints)
         .then(localStream => {
+
             myvideo.srcObject = localStream;
             myvideo.muted = true;
+            
 
             localStream.getTracks().forEach(track => {
+
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+            
+
+                canvas.width = track.getSettings().width;
+                canvas.height = track.getSettings().height;
+
+                setInterval(() => {
+                    context.drawImage(myvideo, 0, 0, canvas.width, canvas.height);
+                    const frameData = canvas.toDataURL('image/jpeg');
+                    
+                    flaskSocket.emit('flask_video', frameData);
+                    console.log('emitting frame data');
+                    
+                }, 1000 / 30);
+
                 for (let key in connections) {
                     connections[key].addTrack(track, localStream);
                     if (track.kind === 'audio')
@@ -270,7 +367,7 @@ function startCall() {
 }
 
 function handleVideoOffer(offer, sid, cname, micinf, vidinf) {
-
+    console.log('handleVideoOffer called')
     cName[sid] = cname;
     console.log('video offered recevied');
     micInfo[sid] = micinf;
