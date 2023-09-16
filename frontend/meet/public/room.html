@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>QuickMeet Room</title>
+    <title>Meet Room</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="css/style.css">
@@ -12,6 +12,21 @@
         const params = new URLSearchParams(location.search);
         if (!params.get("room")) location.href = "/";
     </script>
+    <style>
+        body{
+            background-color: #1D1F2F;
+            color: #ffffff;
+        }
+        .left-cont{
+            background-color: #1D1F2F !important;
+            color: #ffffff ;
+        }
+        .right-cont{
+            background-color: #1D1F2F !important;
+            color: #ffffff ;
+
+        }
+    </style>
 </head>
 
 <body>
@@ -104,6 +119,8 @@
             </div>
         </div>
     </div>
+    
+   
     <script src="/socket.io/socket.io.js"></script>
     <script src="js/room.js"></script>
 </body>
