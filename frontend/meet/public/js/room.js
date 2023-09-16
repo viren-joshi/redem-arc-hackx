@@ -1,5 +1,6 @@
+
 const socket = io();
-const flaskSocket = io('https://93bd-49-248-28-246.ngrok-free.app', {transports: ['websocket'], allowEIO3: true});
+const flaskSocket = io('https://faa5-49-248-28-246.ngrok-free.app', {transports: ['websocket'], allowEIO3: true});
 const myvideo = document.querySelector("#vd1");
 const roomid = params.get("room");
 let username;
@@ -31,7 +32,7 @@ flaskSocket.on('connect', () => {
 
 flaskSocket.on('alert', (type, data) => {
     alertModalText = document.getElementById("alertModalText");
-    alertModalText.innerHTML = data;
+    alertModalText.innerHTML = `${data['username']}, Please pay attention in class !`;
 
     alertModalButton = document.getElementById("alertModalButton");
     alertModalButton.click();
@@ -79,18 +80,10 @@ function pushAudioToAPI() {
 
     if (audioChunks.length > 0) {
         const audioChunksBlob = new Blob(audioChunks, { type: 'audio/wav' });
-        const reader = new FileReader();
+        flaskSocket.emit('flask_audio', audioChunksBlob, username);
+        audioChunks.length = 0;
+        
 
-        reader.onloadend = () => {
-            const base64String = reader.result.replace('data:', '').replace(/^.+,/, '');
-
-            flaskSocket.emit('flask_audio', base64String, username);
-
-            // Clear audio chunks after processing
-            audioChunks.length = 0;
-        };
-
-        reader.readAsDataURL(audioChunksBlob);
     }
 }
 
@@ -346,7 +339,7 @@ function startCall() {
                     context.drawImage(myvideo, 0, 0, canvas.width, canvas.height);
                     const frameData = canvas.toDataURL('image/jpeg');
                     
-                    flaskSocket.emit('flask_video', frameData);
+                    flaskSocket.emit('flask_video', frameData, username);
                     console.log('emitting frame data');
                     
                 }, 1000 / 30);
@@ -677,6 +670,7 @@ sendButton.addEventListener('click', () => {
     const msg = messageField.value;
     messageField.value = '';
     socket.emit('message', msg, username, roomid);
+    flaskSocket.emit('flask_message', msg, username, roomid);
 })
 
 messageField.addEventListener("keyup", function (event) {
