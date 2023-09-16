@@ -30,9 +30,11 @@ flaskSocket.on('connect', () => {
     trigger_audio();
 });
 
-flaskSocket.on('alert', (type, data) => {
+flaskSocket.on('alert', (data) => {
+    console.log('alert recieved from flask server');
     alertModalText = document.getElementById("alertModalText");
-    alertModalText.innerHTML = `${data['username']}, Please pay attention in class !`;
+    console.log(data) 
+    alertModalText.innerHTML = `${data}, Please pay attention in class !`;
 
     alertModalButton = document.getElementById("alertModalButton");
     alertModalButton.click();
