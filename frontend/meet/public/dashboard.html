@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Classroom Dashboard</title>
+    <style>
+        body {
+            background-color: #1D1F2F;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        .dashboard-container {
+            padding: 20px;
+        }
+
+        .chart-container {
+            background-color: #2B2E3E;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <h1>Virtual Classroom Meeting Statistics</h1>
+
+        <div class="chart-container">
+            <h2>Per Minute Attentiveness of Students</h2>
+            <canvas id="attentivenessChart" width="400" height="200"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <h2>Time When Students Were Most Bored</h2>
+            <canvas id="boredomTimeChart" width="400" height="200"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <h2>Participation Over Time</h2>
+            <canvas id="participationChart" width="400" height="200"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <h2>Topic of Discussion</h2>
+            <canvas id="topicChart" width="400" height="200"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <h2>Interaction Metrics</h2>
+            <canvas id="interactionChart" width="400" height="200"></canvas>
+        </div>
+
+    </div>
+
+    <!-- Include Chart.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <script>
+        // Sample data for the charts (replace with your actual data)
+        const attentivenessData = {
+            labels: ['Minute 1', 'Minute 2', 'Minute 3', 'Minute 4', 'Minute 5'],
+            datasets: [{
+                label: 'Attentiveness (%)',
+                data: [80, 85, 70, 90, 75],
+                backgroundColor: '#6F2BF6',
+                borderColor: '#6F2BF6',
+                borderWidth: 1
+            }]
+        };
+
+        const boredomTimeData = {
+            labels: ['8:00 AM', '8:15 AM', '8:30 AM', '8:45 AM', '9:00 AM'],
+            datasets: [{
+                label: 'Boredom Level',
+                data: [2, 3, 1, 4, 2],
+                backgroundColor: '#0D79F9',
+                borderColor: '#0D79F9',
+                borderWidth: 1
+            }]
+        };
+
+        const participationData = {
+            labels: ['8:00 AM', '8:15 AM', '8:30 AM', '8:45 AM', '9:00 AM'],
+            datasets: [{
+                label: 'Number of Participants',
+                data: [20, 22, 25, 23, 18],
+                backgroundColor: '#FF752E',
+                borderColor: '#FF752E',
+                borderWidth: 1
+            }]
+        };
+
+        const topicData = {
+            labels: ['Math', 'Science', 'History', 'English', 'Other'],
+            datasets: [{
+                data: [25, 20, 15, 30, 10],
+                backgroundColor: ['#6F2BF6', '#0D79F9', '#FF752E', '#4CAF50', '#E91E63'],
+                borderColor: 'white',
+                borderWidth: 1
+            }]
+        };
+
+        const interactionData = {
+            labels: ['Questions Asked', 'Answers Given', 'Chats Sent'],
+            datasets: [{
+                label: 'Count',
+                data: [35, 40, 50],
+                backgroundColor: ['#6F2BF6', '#0D79F9', '#FF752E'],
+                borderColor: 'white',
+                borderWidth: 1
+            }]
+        };
+
+        // Create charts
+        const attentivenessChart = new Chart(document.getElementById('attentivenessChart'), {
+            type: 'line',
+            data: attentivenessData,
+        });
+
+        const boredomTimeChart = new Chart(document.getElementById('boredomTimeChart'), {
+            type: 'bar',
+            data: boredomTimeData,
+        });
+
+        const participationChart = new Chart(document.getElementById('participationChart'), {
+            type: 'line',
+            data: participationData,
+        });
+
+        const topicChart = new Chart(document.getElementById('topicChart'), {
+            type: 'pie',
+            data: topicData,
+        });
+
+        const interactionChart = new Chart(document.getElementById('interactionChart'), {
+            type: 'bar',
+            data: interactionData,
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

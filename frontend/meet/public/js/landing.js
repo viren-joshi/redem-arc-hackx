@@ -4,6 +4,7 @@ const codeCont = document.querySelector('#roomcode');
 const joinBut = document.querySelector('#joinroom');
 const mic = document.querySelector('#mic');
 const cam = document.querySelector('#webcam');
+const dashButton = document.querySelector('#checkDashboard');
 
 let micAllowed = 1;
 let camAllowed = 1;
@@ -110,3 +111,7 @@ mic.addEventListener('click', () => {
         micAllowed = 1;
     }
 })
+
+function changeNavigate(){
+    window.location.href = "./dashboard.html";
+}
